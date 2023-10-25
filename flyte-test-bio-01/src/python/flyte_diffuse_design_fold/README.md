@@ -52,7 +52,6 @@ I've laid out the project so that python type checkers like pyright/pylance will
 just need to manage your environments carefully, and switch environments when you switch to developing on
 different containers.
 
-
 You can check out the `Dockerfiles` to see how to recreate the development environments.
 
 ## Preparing the cluster
@@ -64,6 +63,11 @@ I've made it very simple to get you started with this demo, just run `sh ./setup
 - setup the demo cluster
 - build the images & push the images to the cluster
 - modify the cluster to allow more compute intensive jobs
+
+### GPU note
+
+I used cuda base-images to make the docker images somewhat CUDA ready, but I did not test this with GPUs at all.
+I believe you will need to make changes to the flytekit.task definitions if you want the jobs to go through GPUs.
 
 
 ## Run a job
