@@ -1,0 +1,50 @@
+FROM mambaorg/micromamba:1.5.1 as micromamba
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get -qq update \
+    && apt-get -qq install -y \
+    git \
+    wget \
+    tar \
+    unzip \
+    aria2 \
+    build-essential \
+    && apt-get -qq clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install miniconda
+USER root
+ENV MAMBA_USER=root
+ENV MAMBA_USER_ID=0
+ENV MAMBA_USER_GID=0
+ENV MAMBA_ROOT_PREFIX="/opt/conda"
+ENV MAMBA_EXE="/bin/micromamba"
+
+COPY --from=micromamba "$MAMBA_EXE" "$MAMBA_EXE"
+COPY --from=micromamba /usr/local/bin/_activate_current_env.sh /usr/local/bin/_activate_current_env.sh
+COPY --from=micromamba /usr/local/bin/_dockerfile_shell.sh /usr/local/bin/_dockerfile_shell.sh
+COPY --from=micromamba /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY --from=micromamba /usr/local/bin/_dockerfile_initialize_user_accounts.sh /usr/local/bin/_dockerfile_initialize_user_accounts.sh
+COPY --from=micromamba /usr/local/bin/_dockerfile_setup_root_prefix.sh /usr/local/bin/_dockerfile_setup_root_prefix.sh
+
+RUN /usr/local/bin/_dockerfile_initialize_user_accounts.sh && \
+    /usr/local/bin/_dockerfile_setup_root_prefix.sh
+
+SHELL ["/usr/local/bin/_dockerfile_shell.sh"]
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+CMD ["/bin/bash"]
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN micromamba install -y python=3.9 -c conda-forge
+RUN pip install -q --no-cache-dir flytekit flytekitplugins-deck-standard
+
+# START HERE TO TAKEADVANTAGE OF OTHER IMAGE CACHES
+RUN pip install -q --no-cache-dir numpy \
+  &&  pip install -q --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu118 \
+  && micromamba clean --all --yes
+RUN git clone https://github.com/dauparas/ProteinMPNN.git /app/proteinmpnn
+
+RUN rm -rf /var/lib/apt/lists/* \
+  && apt-get autoremove -y \
+  && apt-get clean

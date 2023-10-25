@@ -1,0 +1,15 @@
+[project]
+name = "workflow_2_lib"
+description="Workflow library compatible with foo==2.0.0"
+requires-python = ">=3.8"
+authors = [{name = "Danny Farrell", email = "danpf@uw.edu"}]
+dependencies = [
+  "Foo==2.0.0",
+  "flytekit",
+  "flytekitplugins-deck-standard",
+]
+version = "1.0.0"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

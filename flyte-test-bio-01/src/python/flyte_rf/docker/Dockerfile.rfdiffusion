@@ -1,0 +1,100 @@
+# Usage: 
+# git clone https://github.com/RosettaCommons/RFdiffusion.git
+# cd RFdiffusion
+# docker build -f docker/Dockerfile -t rfdiffusion .
+# mkdir $HOME/inputs $HOME/outputs $HOME/models
+# bash scripts/download_models.sh $HOME/models
+# wget -P $HOME/inputs https://files.rcsb.org/view/5TPN.pdb
+
+# docker run -it --rm --gpus all \
+#   -v $HOME/models:$HOME/models \
+#   -v $HOME/inputs:$HOME/inputs \
+#   -v $HOME/outputs:$HOME/outputs \
+#   rfdiffusion \
+#   inference.output_prefix=$HOME/outputs/motifscaffolding \
+#   inference.model_directory_path=$HOME/models \
+#   inference.input_pdb=$HOME/inputs/5TPN.pdb \
+#   inference.num_designs=3 \
+#   'contigmap.contigs=[10-40/A163-181/10-40]'
+
+FROM mambaorg/micromamba:1.5.1 as micromamba
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get -qq update \
+    && apt-get -qq install -y \
+    git \
+    wget \
+    tar \
+    unzip \
+    aria2 \
+    build-essential \
+    && apt-get -qq clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install miniconda
+USER root
+ENV MAMBA_USER=root
+ENV MAMBA_USER_ID=0
+ENV MAMBA_USER_GID=0
+ENV MAMBA_ROOT_PREFIX="/opt/conda"
+ENV MAMBA_EXE="/bin/micromamba"
+
+COPY --from=micromamba "$MAMBA_EXE" "$MAMBA_EXE"
+COPY --from=micromamba /usr/local/bin/_activate_current_env.sh /usr/local/bin/_activate_current_env.sh
+COPY --from=micromamba /usr/local/bin/_dockerfile_shell.sh /usr/local/bin/_dockerfile_shell.sh
+COPY --from=micromamba /usr/local/bin/_entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY --from=micromamba /usr/local/bin/_dockerfile_initialize_user_accounts.sh /usr/local/bin/_dockerfile_initialize_user_accounts.sh
+COPY --from=micromamba /usr/local/bin/_dockerfile_setup_root_prefix.sh /usr/local/bin/_dockerfile_setup_root_prefix.sh
+
+RUN /usr/local/bin/_dockerfile_initialize_user_accounts.sh && \
+    /usr/local/bin/_dockerfile_setup_root_prefix.sh
+
+SHELL ["/usr/local/bin/_dockerfile_shell.sh"]
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+CMD ["/bin/bash"]
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN micromamba install -y python=3.9 -c conda-forge
+RUN pip install -q --no-cache-dir flytekit flytekitplugins-deck-standard
+
+# START HERE TO TAKEADVANTAGE OF OTHER IMAGE CACHES
+ARG RFFILEDIR=/app/rf_files
+
+RUN git clone https://github.com/RosettaCommons/RFdiffusion.git /app/RFdiffusion \
+  && mkdir -p $RFFILEDIR/inputs $RFFILEDIR/outputs $RFFILEDIR/models \
+  && sed -i 's/wget -P/aria2c -Z -x 12 -s 12 -d/g' /app/RFdiffusion/scripts/download_models.sh \
+  && bash /app/RFdiffusion/scripts/download_models.sh $RFFILEDIR/models \
+  && pip install -q --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu118 \
+  && pip install -q --no-cache-dir \
+  dgl -f https://data.dgl.ai/wheels/cu118/repo.html \
+  dglgo -f https://data.dgl.ai/wheels-test/repo.html \
+  && pip install -q --no-cache-dir \
+  e3nn \
+  wandb \
+  pynvml \
+  git+https://github.com/NVIDIA/dllogger#egg=dllogger \
+  decorator \
+  hydra-core \
+  pyrsistent \
+  omegaconf \
+  icecream \
+  scipy \
+  opt_einsum \
+  opt_einsum_fx \
+  /app/RFdiffusion/env/SE3Transformer \
+  && pip install --no-cache-dir /app/RFdiffusion --no-deps \
+  && cd /app \
+  && aria2c -Z -x 12 -s 12 https://files.ipd.uw.edu/krypton/schedules.zip \
+  && unzip schedules.zip \
+  && rm schedules.zip \
+  && cd - \
+  && micromamba clean --all --yes
+
+RUN rm -rf /var/lib/apt/lists/* \
+  && apt-get autoremove -y \
+  && apt-get clean
+
+WORKDIR /app/RFdiffusion
+
+ENV DGLBACKEND="pytorch"

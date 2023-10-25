@@ -1,0 +1,17 @@
+[project]
+name = "flyte_diffuse_design_fold"
+description="Flyte flyte diffuse design fold workflow"
+requires-python = ">=3.8"
+authors = [{name = "Danny Farrell", email = "16297104+danpf@users.noreply.github.com"}]
+version = "1.0.0"
+dependencies = [
+  "flytekit",
+  "flytekitplugins-deck-standard",
+]
+
+[tool.setuptools.packages.find]
+where = ["flyte_rf"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

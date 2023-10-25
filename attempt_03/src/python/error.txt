@@ -1,0 +1,234 @@
+2023-10-04 14:45:16,699662 ERROR    2023-10-04 14:45:16,699 flytekit ERROR Exception when executing Error encountered while executing 'main':                                                           base_task.py:612
+                                      name 'Foo' is not defined
+                                    ╭─────────────────────────────────────────────────────────────── Traceback (most recent call last) ───────────────────────────────────────────────────────────────╮
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/exceptions/scopes.py:206 in user_entry_point                │
+                                    │                                                                                                                                                                 │
+                                    │   203 │   │   │   │   raise type(exc)(f"Error encountered while executing '{fn_name}':\n                                                                        │
+                                    │       {exc}") from exc                                                                                                                                          │
+                                    │   204 │   │   else:                                                                                                                                             │
+                                    │   205 │   │   │   try:                                                                                                                                          │
+                                    │ ❱ 206 │   │   │   │   return wrapped(*args, **kwargs)                                                                                                           │
+                                    │   207 │   │   │   except FlyteScopedException as scoped:                                                                                                        │
+                                    │   208 │   │   │   │   raise scoped                                                                                                                              │
+                                    │   209 │   │   │   except _user_exceptions.FlyteUserException:                                                                                                   │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flyte_science/workflow1/library/workflow.py:6 in workflow1           │
+                                    │                                                                                                                                                                 │
+                                    │   3                                                                                                                                                             │
+                                    │   4 @workflow                                                                                                                                                   │
+                                    │   5 def workflow1(input_: str) -> str:                                                                                                                          │
+                                    │ ❱ 6 │   from .tasks import task2                                                                                                                                │
+                                    │   7 │                                                                                                                                                           │
+                                    │   8 │   return task2(input_=input_)                                                                                                                             │
+                                    │   9                                                                                                                                                             │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flyte_science/workflow1/library/tasks.py:9 in <module>               │
+                                    │                                                                                                                                                                 │
+                                    │    6 │   from foo import Foo                                                                                                                                    │
+                                    │    7                                                                                                                                                            │
+                                    │    8                                                                                                                                                            │
+                                    │ ❱  9 @task(container_image=foo1_image_spec)                                                                                                                     │
+                                    │   10 def task1() -> "Foo":                                                                                                                                      │
+                                    │   11 │   from foo import Foo                                                                                                                                    │
+                                    │   12                                                                                                                                                            │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/task.py:260 in wrapper                                 │
+                                    │                                                                                                                                                                 │
+                                    │   257 │   │   │   timeout=timeout,                                                                                                                              │
+                                    │   258 │   │   )                                                                                                                                                 │
+                                    │   259 │   │                                                                                                                                                     │
+                                    │ ❱ 260 │   │   task_instance = TaskPlugins.find_pythontask_plugin(type(task_config))(                                                                            │
+                                    │   261 │   │   │   task_config,                                                                                                                                  │
+                                    │   262 │   │   │   fn,                                                                                                                                           │
+                                    │   263 │   │   │   metadata=_metadata,                                                                                                                           │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/tracker.py:77 in __call__                              │
+                                    │                                                                                                                                                                 │
+                                    │    74 │   │   return None, None                                                                                                                                 │
+                                    │    75 │                                                                                                                                                         │
+                                    │    76 │   def __call__(cls, *args, **kwargs):                                                                                                                   │
+                                    │ ❱  77 │   │   o = super(InstanceTrackingMeta, cls).__call__(*args, **kwargs)                                                                                    │
+                                    │    78 │   │   mod_name, mod_file = InstanceTrackingMeta._find_instance_module()                                                                                 │
+                                    │    79 │   │   o._instantiated_in = mod_name                                                                                                                     │
+                                    │    80 │   │   o._module_file = mod_file                                                                                                                         │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/python_function_task.py:118 in __init__                │
+                                    │                                                                                                                                                                 │
+                                    │   115 │   │   """                                                                                                                                               │
+                                    │   116 │   │   if task_function is None:                                                                                                                         │
+                                    │   117 │   │   │   raise ValueError("TaskFunction is a required parameter for                                                                                    │
+                                    │       PythonFunctionTask")                                                                                                                                      │
+                                    │ ❱ 118 │   │   self._native_interface = transform_function_to_interface(task_function,                                                                           │
+                                    │       Docstring(callable_=task_function))                                                                                                                       │
+                                    │   119 │   │   mutated_interface = self._native_interface.remove_inputs(ignore_input_vars)                                                                       │
+                                    │   120 │   │   name, _, _, _ = extract_task_module(task_function)                                                                                                │
+                                    │   121 │   │   super().__init__(                                                                                                                                 │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/interface.py:308 in transform_function_to_interface    │
+                                    │                                                                                                                                                                 │
+                                    │   305 │   For now the fancy object, maybe in the future a dumb object.                                                                                          │
+                                    │   306 │                                                                                                                                                         │
+                                    │   307 │   """                                                                                                                                                   │
+                                    │ ❱ 308 │   type_hints = get_type_hints(fn, include_extras=True)                                                                                                  │
+                                    │   309 │   signature = inspect.signature(fn)                                                                                                                     │
+                                    │   310 │   return_annotation = type_hints.get("return", None)                                                                                                    │
+                                    │   311                                                                                                                                                           │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/typing.py:2383 in get_type_hints                                                   │
+                                    │                                                                                                                                                                 │
+                                    │   2380 │   │   │   │   is_argument=not isinstance(obj, types.ModuleType),                                                                                       │
+                                    │   2381 │   │   │   │   is_class=False,                                                                                                                          │
+                                    │   2382 │   │   │   )                                                                                                                                            │
+                                    │ ❱ 2383 │   │   hints[name] = _eval_type(value, globalns, localns)                                                                                               │
+                                    │   2384 │   return hints if include_extras else {k: _strip_annotations(t) for k, t in                                                                            │
+                                    │        hints.items()}                                                                                                                                           │
+                                    │   2385                                                                                                                                                          │
+                                    │   2386                                                                                                                                                          │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/typing.py:374 in _eval_type                                                        │
+                                    │                                                                                                                                                                 │
+                                    │    371 │   ForwardRef.                                                                                                                                          │
+                                    │    372 │   """                                                                                                                                                  │
+                                    │    373 │   if isinstance(t, ForwardRef):                                                                                                                        │
+                                    │ ❱  374 │   │   return t._evaluate(globalns, localns, recursive_guard)                                                                                           │
+                                    │    375 │   if isinstance(t, (_GenericAlias, GenericAlias, types.UnionType)):                                                                                    │
+                                    │    376 │   │   if isinstance(t, GenericAlias):                                                                                                                  │
+                                    │    377 │   │   │   args = tuple(                                                                                                                                │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/typing.py:884 in _evaluate                                                         │
+                                    │                                                                                                                                                                 │
+                                    │    881 │   │   │   │   │   sys.modules.get(self.__forward_module__, None), '__dict__', globalns                                                                 │
+                                    │    882 │   │   │   │   )                                                                                                                                        │
+                                    │    883 │   │   │   type_ = _type_check(                                                                                                                         │
+                                    │ ❱  884 │   │   │   │   eval(self.__forward_code__, globalns, localns),                                                                                          │
+                                    │    885 │   │   │   │   "Forward references must evaluate to types.",                                                                                            │
+                                    │    886 │   │   │   │   is_argument=self.__forward_is_argument__,                                                                                                │
+                                    │    887 │   │   │   │   allow_special_forms=self.__forward_is_class__,                                                                                           │
+                                    │ in <module>:1                                                                                                                                                   │
+                                    ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                    NameError: name 'Foo' is not defined
+
+                                    During handling of the above exception, another exception occurred:
+
+                                    ╭─────────────────────────────────────────────────────────────── Traceback (most recent call last) ───────────────────────────────────────────────────────────────╮
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/exceptions/scopes.py:199 in user_entry_point                │
+                                    │                                                                                                                                                                 │
+                                    │   196 │   │   │   # See comment at this location for system_entry_point                                                                                         │
+                                    │   197 │   │   │   fn_name = wrapped.__name__                                                                                                                    │
+                                    │   198 │   │   │   try:                                                                                                                                          │
+                                    │ ❱ 199 │   │   │   │   return wrapped(*args, **kwargs)                                                                                                           │
+                                    │   200 │   │   │   except FlyteScopedException as exc:                                                                                                           │
+                                    │   201 │   │   │   │   raise exc.type(f"Error encountered while executing '{fn_name}':\n                                                                         │
+                                    │       {exc.value}") from exc                                                                                                                                    │
+                                    │   202 │   │   │   except Exception as exc:                                                                                                                      │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/git/flyte-eval/attempt_03/src/python/flyte_science/scripts/one_off_combo_script.py:13 in main                                                │
+                                    │                                                                                                                                                                 │
+                                    │   10 @dynamic                                                                                                                                                   │
+                                    │   11 def main() -> str:                                                                                                                                         │
+                                    │   12 │   input_ = "TEST1 "                                                                                                                                      │
+                                    │ ❱ 13 │   wf1_ret = workflow1(input_=input_)                                                                                                                     │
+                                    │   14 │   wf2_ret = workflow2(input_=wf1_ret)                                                                                                                    │
+                                    │   15 │   wf3_ret = workflow3(input_=wf2_ret)                                                                                                                    │
+                                    │   16 │   return wf3_ret                                                                                                                                         │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/workflow.py:274 in __call__                            │
+                                    │                                                                                                                                                                 │
+                                    │   271 │   │   # Get default arguments and override with kwargs passed in                                                                                        │
+                                    │   272 │   │   input_kwargs = self.python_interface.default_inputs_as_kwargs                                                                                     │
+                                    │   273 │   │   input_kwargs.update(kwargs)                                                                                                                       │
+                                    │ ❱ 274 │   │   self.compile()                                                                                                                                    │
+                                    │   275 │   │   try:                                                                                                                                              │
+                                    │   276 │   │   │   return flyte_entity_call_handler(self, *args, **input_kwargs)                                                                                 │
+                                    │   277 │   │   except Exception as exc:                                                                                                                          │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/workflow.py:674 in compile                             │
+                                    │                                                                                                                                                                 │
+                                    │   671 │   │   │   # Construct the default input promise bindings, but then override with the                                                                    │
+                                    │       provided inputs, if any                                                                                                                                   │
+                                    │   672 │   │   │   input_kwargs = construct_input_promises([k for k in                                                                                           │
+                                    │       self.interface.inputs.keys()])                                                                                                                            │
+                                    │   673 │   │   │   input_kwargs.update(kwargs)                                                                                                                   │
+                                    │ ❱ 674 │   │   │   workflow_outputs =                                                                                                                            │
+                                    │       exception_scopes.user_entry_point(self._workflow_function)(**input_kwargs)                                                                                │
+                                    │   675 │   │   │   all_nodes.extend(comp_ctx.compilation_state.nodes)                                                                                            │
+                                    │   676 │   │   │                                                                                                                                                 │
+                                    │   677 │   │   │   # This little loop was added as part of the task resolver change. The task                                                                    │
+                                    │       resolver interface itself is                                                                                                                              │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/exceptions/scopes.py:217 in user_entry_point                │
+                                    │                                                                                                                                                                 │
+                                    │   214 │   │   │   │   # This is why this function exists - arbitrary exceptions that we don't                                                                   │
+                                    │       know what to do with are                                                                                                                                  │
+                                    │   215 │   │   │   │   # interpreted as user exceptions.                                                                                                         │
+                                    │   216 │   │   │   │   # This will also catch FlyteUserException re-raised by the                                                                                │
+                                    │       system_entry_point handler                                                                                                                                │
+                                    │ ❱ 217 │   │   │   │   raise FlyteScopedUserException(*_exc_info())                                                                                              │
+                                    │   218 │   finally:                                                                                                                                              │
+                                    │   219 │   │   _CONTEXT_STACK.pop()                                                                                                                              │
+                                    │   220                                                                                                                                                           │
+                                    ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                    FlyteScopedUserException: name 'Foo' is not defined
+
+                                    The above exception was the direct cause of the following exception:
+
+                                    ╭─────────────────────────────────────────────────────────────── Traceback (most recent call last) ───────────────────────────────────────────────────────────────╮
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/base_task.py:610 in dispatch_execute                   │
+                                    │                                                                                                                                                                 │
+                                    │   607 │   │   │   logger.info(f"Invoking {self.name} with inputs: {native_inputs}")                                                                             │
+                                    │   608 │   │   │   try:                                                                                                                                          │
+                                    │   609 │   │   │   │   with timeit("Execute user level code"):                                                                                                   │
+                                    │ ❱ 610 │   │   │   │   │   native_outputs = self.execute(**native_inputs)                                                                                        │
+                                    │   611 │   │   │   except Exception as e:                                                                                                                        │
+                                    │   612 │   │   │   │   logger.exception(f"Exception when executing {e}")                                                                                         │
+                                    │   613 │   │   │   │   raise e                                                                                                                                   │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/python_function_task.py:180 in execute                 │
+                                    │                                                                                                                                                                 │
+                                    │   177 │   │   │   kwargs["async_ctx"] = FlyteContextManager.current_context()                                                                                   │
+                                    │   178 │   │   │   return exception_scopes.user_entry_point(self._task_function)(**kwargs)                                                                       │
+                                    │   179 │   │   elif self.execution_mode == self.ExecutionBehavior.DYNAMIC:                                                                                       │
+                                    │ ❱ 180 │   │   │   return self.dynamic_execute(self._task_function, **kwargs)                                                                                    │
+                                    │   181 │                                                                                                                                                         │
+                                    │   182 │   def _create_and_cache_dynamic_workflow(self):                                                                                                         │
+                                    │   183 │   │   if self._wf is None:                                                                                                                              │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/python_function_task.py:280 in dynamic_execute         │
+                                    │                                                                                                                                                                 │
+                                    │   277 │   │   │   # local_execute directly though since that converts inputs into Promises.                                                                     │
+                                    │   278 │   │   │   logger.debug(f"Executing Dynamic workflow, using raw inputs {kwargs}")                                                                        │
+                                    │   279 │   │   │   self._create_and_cache_dynamic_workflow()                                                                                                     │
+                                    │ ❱ 280 │   │   │   function_outputs = cast(PythonFunctionWorkflow, self._wf).execute(**kwargs)                                                                   │
+                                    │   281 │   │   │                                                                                                                                                 │
+                                    │   282 │   │   │   if isinstance(function_outputs, VoidPromise) or function_outputs is None:                                                                     │
+                                    │   283 │   │   │   │   return VoidPromise(self.name)                                                                                                             │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/core/workflow.py:746 in execute                             │
+                                    │                                                                                                                                                                 │
+                                    │   743 │   │   call execute from dispatch_execute which is in local_execute, workflows should                                                                    │
+                                    │       also call an execute inside                                                                                                                               │
+                                    │   744 │   │   local_execute. This makes mocking cleaner.                                                                                                        │
+                                    │   745 │   │   """                                                                                                                                               │
+                                    │ ❱ 746 │   │   return exception_scopes.user_entry_point(self._workflow_function)(**kwargs)                                                                       │
+                                    │   747                                                                                                                                                           │
+                                    │   748                                                                                                                                                           │
+                                    │   749 @overload                                                                                                                                                 │
+                                    │                                                                                                                                                                 │
+                                    │ /Users/meeeeeeeeee/.local/share/micromamba/envs/tightyflighty/lib/python3.11/site-packages/flytekit/exceptions/scopes.py:201 in user_entry_point                │
+                                    │                                                                                                                                                                 │
+                                    │   198 │   │   │   try:                                                                                                                                          │
+                                    │   199 │   │   │   │   return wrapped(*args, **kwargs)                                                                                                           │
+                                    │   200 │   │   │   except FlyteScopedException as exc:                                                                                                           │
+                                    │ ❱ 201 │   │   │   │   raise exc.type(f"Error encountered while executing '{fn_name}':\n                                                                         │
+                                    │       {exc.value}") from exc                                                                                                                                    │
+                                    │   202 │   │   │   except Exception as exc:                                                                                                                      │
+                                    │   203 │   │   │   │   raise type(exc)(f"Error encountered while executing '{fn_name}':\n                                                                        │
+                                    │       {exc}") from exc                                                                                                                                          │
+                                    │   204 │   │   else:                                                                                                                                             │
+                                    ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                    NameError: Error encountered while executing 'main':
+                                      name 'Foo' is not defined
+Failed with Unknown Exception <class 'NameError'> Reason: Error encountered while executing 'main':
+  name 'Foo' is not defined
+Error encountered while executing 'main':
+  name 'Foo' is not defined
