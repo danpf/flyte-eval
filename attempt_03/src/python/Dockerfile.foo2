@@ -1,8 +1,0 @@
-FROM ghcr.io/flyteorg/flytekit:py3.11-1.9.1
-
-USER root
-
-COPY ./foo_v2 /opt/foo_v2
-RUN pip install /opt/foo_v2
-
-USER flytekit
