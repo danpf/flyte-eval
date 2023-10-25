@@ -134,15 +134,6 @@ def run_rf_mpnn_esm_wf(
     all_mpnn_results = []
     all_diff_results = []
 
-    # We actually run mpnn on the input pdb also, just because foldingdiff is so
-    # bad that mpnn mostly returns poly-glycine
-    input_pdb_mpnn_results = run_mpnn(
-        input_pdb_files=[input_pdb_file],
-        protein_mpnn_commandline_args=protein_mpnn_commandline_args,
-        protein_mpnn_num_designs=protein_mpnn_num_designs,
-        useless_arg=0,
-    )
-
     # We do 10 at a time because each foldingdiff workflow creates 10 backbones
     for x in range(int(diffusion_num_designs / 10) + 1):
         c_rf_diffusion_results = run_foldingdiff(
